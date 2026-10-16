@@ -1,3 +1,13 @@
+## [1.0.1](https://github.com/gciatto/template-python-project-uv/compare/1.0.0...1.0.1) (2026-10-16)
+
+### Bug Fixes
+
+* reject module names that are keywords, stdlib modules or existing paths ([0a4a765](https://github.com/gciatto/template-python-project-uv/commit/0a4a76508a38508f7945170234404e952163f3f0))
+
+### Build and continuous integration
+
+* publish to PyPI before the release commit and tag, fail early on missing tokens ([413d0c4](https://github.com/gciatto/template-python-project-uv/commit/413d0c4bbe1ac0c50c3589448b00ee044de18494))
+
 ## 1.0.0 (2026-10-16)
 
 ### Features
