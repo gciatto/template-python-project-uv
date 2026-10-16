@@ -61,6 +61,7 @@ one tagged line each. Foreign hooks are never overwritten. `--no-verify` skips t
 ## Releases
 
 Conventional Commits drive semantic-release (`release.config.mjs`), which runs
-`uv version <next> && uv build`, then `uv publish` (to TestPyPI while the repo name contains
-`template`). `pyproject.toml` is the only version source; never bump it by hand.
+`uv version <next> && uv build && uv publish` (to TestPyPI while the repo name contains
+`template`) in its prepare step, before the release commit and tag: a failed upload leaves
+neither. `pyproject.toml` is the only version source; never bump it by hand.
 `CHANGELOG.md` is generated.

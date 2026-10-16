@@ -3,7 +3,8 @@ let testPypi = (process.env.RELEASE_TEST_PYPI || "false").toLowerCase() === "tru
 const pypiToken = process.env.PYPI_TOKEN;
 const testPypiToken = process.env.TEST_PYPI_TOKEN;
 
-let prepareCmd = "uv version \${nextRelease.version} && uv build";
+// Publishing to (Test)PyPI happens in `prepare`, i.e. before @semantic-release/git commits and
+// before the tag is pushed: if the upload fails, no release commit or tag is produced.
 let publishCmd = `uv publish --token `;
 
 if (testPypi) {
@@ -16,12 +17,20 @@ if (dryRun) {
     publishCmd += " --dry-run";
 }
 
+// Fail in verifyConditions, before anything is built, if the token for the target index is missing.
+const tokenVar = testPypi ? "TEST_PYPI_TOKEN" : "PYPI_TOKEN";
+const verifyConditionsCmd = dryRun
+    ? undefined
+    : `test -n "$${tokenVar}" || { echo "${tokenVar} is not set" >&2; exit 1; }`;
+
+const prepareCmd = `uv version \${nextRelease.version} && uv build && ${publishCmd}`;
+
 import config from 'semantic-release-preconfigured-conventional-commits' with {type: 'json'};
 
 config.plugins.push(
     ["@semantic-release/exec", {
+        "verifyConditionsCmd": verifyConditionsCmd,
         "prepareCmd": prepareCmd,
-        "publishCmd": publishCmd,
     }]
 )
 
