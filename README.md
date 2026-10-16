@@ -86,7 +86,6 @@ uv python list
 
     ```bash
     uv run poe static-checks
-    uv run poe format-check
     uv run poe test
     ```
 
@@ -121,17 +120,39 @@ can be run through uv.
 | `uv run poe coverage` | Run tests through coverage. |
 | `uv run poe coverage-report` | Print a terminal coverage report with missing lines. |
 | `uv run poe coverage-html` | Generate an HTML coverage report in `htmlcov/`. |
-| `uv run poe ruff-check` | Run Ruff lint checks. |
-| `uv run poe ruff-fix` | Run Ruff and apply automatic fixes. |
-| `uv run poe format` | Format code with Ruff. |
-| `uv run poe format-check` | Check formatting without changing files. |
+| `uv run poe ruff-check` | Lint: report code problems (unused imports, undefined names, risky patterns, ...). |
+| `uv run poe ruff-fix` | Lint and apply the automatic fixes Ruff knows for those problems. |
+| `uv run poe format-check` | Report files whose layout (quotes, wrapping, spacing) differs from Ruff's style. |
+| `uv run poe format` | Rewrite files into Ruff's style. |
 | `uv run poe mypy` | Type-check `main_package/`, `tests/` and `scripts/` with Mypy. |
 | `uv run poe compile` | Compile `main_package/`, `tests/` and `scripts/` to catch syntax errors. |
-| `uv run poe static-checks` | Run the configured static checks, currently Ruff and Mypy. |
-| `uv run poe install-hooks [HOOK...]` | Install local Git hooks (`pre-commit`, `conventional-commits`, `no-ai-signature`, `pre-push`; default: all). |
+| `uv run poe static-checks` | Run `compile`, `format-check`, `ruff-check` and `mypy` (what CI runs); changes nothing. |
+| `uv run poe static-fixes` | Run `ruff-fix`, then `format`; fixes most `static-checks` failures except type errors. |
+| `uv run poe install-hooks [HOOK...]` | Install local Git hooks (see [Git Hooks](#git-hooks); default: all). |
 | `uv run poe uninstall-hooks [HOOK...]` | Remove the hooks installed by `install-hooks`. |
 
-Contributor/agent notes (layout, conventions, hooks) are in [`AGENTS.md`](AGENTS.md).
+Linting (`ruff-*`) and formatting (`format*`) are separate Ruff tools: the linter finds code
+problems but ignores layout, the formatter fixes layout but never changes what the code does.
+A file can pass one and fail the other, so both run in `static-checks`.
+
+Contributor/agent notes (layout, conventions) are in [`AGENTS.md`](AGENTS.md).
+
+### Git Hooks
+
+Optional and local: they live in `.git/hooks/`, so each clone opts in with
+`uv run poe install-hooks [HOOK...]`. They catch locally what CI would otherwise reject later.
+`git commit/push --no-verify` skips them once. Existing hooks not installed by this script are
+never overwritten.
+
+| Hook | Runs on | Blocks when | Cost | Install it if |
+| --- | --- | --- | --- | --- |
+| `pre-commit` | every `git commit` | `static-checks` fails | a few seconds per commit | you want every commit to be clean |
+| `conventional-commits` | every commit message | the subject is not `<type>[(scope)][!]: <description>` | none | you push to `main`/`master` (releases depend on it) |
+| `no-ai-signature` | every commit message | it has an AI-assistant trailer or "Generated with" footer | none | you use coding assistants |
+| `pre-push` | every `git push` | `static-checks` or tests fail | the whole test suite per push | you'd rather wait locally than for CI to fail |
+
+`pre-commit` and `pre-push` overlap. For small, frequent commits, `pre-push` alone is usually
+enough.
 
 
 ## Release a new version on PyPi
