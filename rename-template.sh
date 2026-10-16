@@ -5,7 +5,7 @@
 set -euo pipefail
 
 TEMPLATE_PROJECT_NAME="uv-python-project-template"
-TEMPLATE_MODULE_NAME="uv_python_project_template"
+TEMPLATE_MODULE_NAME="main_package"
 
 if [[ $# -lt 1 || $# -gt 3 ]]; then
     echo "Usage: $0 <new-project-name> [<author-name> [<author-email>]]" >&2
@@ -28,8 +28,8 @@ fi
 
 cd "$(dirname "$0")"
 
-if [[ ! -d "src/$TEMPLATE_MODULE_NAME" ]]; then
-    echo "Error: src/$TEMPLATE_MODULE_NAME not found; was the project already renamed?" >&2
+if [[ ! -d "$TEMPLATE_MODULE_NAME" ]]; then
+    echo "Error: $TEMPLATE_MODULE_NAME/ not found; was the project already renamed?" >&2
     exit 1
 fi
 
@@ -60,7 +60,7 @@ git grep -lzI -F -e "$TEMPLATE_PROJECT_NAME" -e "$TEMPLATE_MODULE_NAME" -- . ':!
     done
 
 if [[ "$MODULE_NAME" != "$TEMPLATE_MODULE_NAME" ]]; then
-    mv "src/$TEMPLATE_MODULE_NAME" "src/$MODULE_NAME"
+    mv "$TEMPLATE_MODULE_NAME" "$MODULE_NAME"
 fi
 
 echo "Renamed project to '$PROJECT_NAME' with Python module '$MODULE_NAME'."
