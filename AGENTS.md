@@ -7,7 +7,7 @@ secrets, Renovate) lives in `README.md`; do not duplicate it here.
 
 ```
 main_package/     the package, at the repo root (renamed by rename-template.sh)
-  __init__.py     `__version__` and the package logger
+  __init__.py     `__version__` and the package logger (logging is configured only in `__main__.py`)
   __main__.py     `main()`: the `[project.scripts]` entry point and `python -m main_package`
   greeting.py     example module
   model/          example subpackage
