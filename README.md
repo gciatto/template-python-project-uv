@@ -10,19 +10,26 @@ It already includes:
 - [Renovate](https://docs.renovatebot.com/) configuration for automated dependency updates;
 - [semantic-release](https://semantic-release.gitbook.io/semantic-release/) configuration with conventional commits for automated releases to PyPI.
 
-The template starts with a minimal package named `uv_python_project_template`, which will be renamed when you create a new repository from this template.
+The template starts with a minimal package named `main_package`, which will be renamed when you create a new repository from this template.
 
 ## Project Structure
 
 ```bash
 <root directory>
-├── src/                              # source root for the Python package
-│   └── uv_python_project_template/   # main package (renamed into your project name)
-│       ├── __init__.py
-│       └── main.py                   # application entry point
-├── test/                             # test package
+├── main_package/                     # main package (renamed into your project name)
+│   ├── __init__.py                   # package version and logger
+│   ├── __main__.py                   # application entry point (also `python -m main_package`)
+│   ├── greeting.py                   # example module
+│   ├── model/                        # example subpackage
+│   │   └── __init__.py
+│   └── resources/                    # non-code files shipped with the package
+│       ├── __init__.py               # paths to the resource files (DIR_RESOURCES, FILE_*)
+│       ├── config.json               # example configuration
+│       └── greeting.txt              # example long string (e.g. a prompt)
+├── tests/                            # pytest test suite
 │   ├── test_githooks.py              # tests for scripts/githooks.py
-│   └── test_my_class.py              # pytest example
+│   ├── test_main_package.py          # tests for the example package
+│   └── test_model.py                 # pytest examples
 ├── scripts/
 │   └── githooks.py                   # installs/removes local Git hooks
 ├── .github/                          # configuration of GitHub Actions
@@ -83,13 +90,12 @@ uv python list
     uv run poe test
     ```
 
-5. Start building your project in `src/uv_python_project_template/` and add tests under
-   `test/`.
+5. Start building your project in `main_package/` and add tests under `tests/`.
 
 ## Main Commands
 
 ### Running the Application
-`uv run uv_python_project_template` to run the application entry point defined in `pyproject.toml`.
+`uv run main_package` (or `uv run python -m main_package`) to run the application entry point defined in `pyproject.toml`.
 
 
 ### Dependency Management
@@ -97,7 +103,7 @@ uv python list
 | Command | Description |
 | --- | --- |
 | `uv sync` | Create or update the local environment from `pyproject.toml` and `uv.lock`. |
-| `uv run uv_python_project_template` | Run the application entry point. |
+| `uv run main_package` | Run the application entry point. |
 | `uv add <package>` | Add a runtime dependency. |
 | `uv add --dev <package>` | Add a development dependency. |
 | `uv remove <package>` | Remove a dependency. | 
@@ -119,8 +125,8 @@ can be run through uv.
 | `uv run poe ruff-fix` | Run Ruff and apply automatic fixes. |
 | `uv run poe format` | Format code with Ruff. |
 | `uv run poe format-check` | Check formatting without changing files. |
-| `uv run poe mypy` | Type-check `src/` and `test/` with Mypy. |
-| `uv run poe compile` | Compile `src/` and `test/` to catch syntax errors. |
+| `uv run poe mypy` | Type-check `main_package/`, `tests/` and `scripts/` with Mypy. |
+| `uv run poe compile` | Compile `main_package/`, `tests/` and `scripts/` to catch syntax errors. |
 | `uv run poe static-checks` | Run the configured static checks, currently Ruff and Mypy. |
 | `uv run poe install-hooks [HOOK...]` | Install local Git hooks (`pre-commit`, `conventional-commits`, `no-ai-signature`, `pre-push`; default: all). |
 | `uv run poe uninstall-hooks [HOOK...]` | Remove the hooks installed by `install-hooks`. |

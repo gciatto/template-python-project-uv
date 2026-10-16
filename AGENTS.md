@@ -6,16 +6,19 @@ secrets, Renovate) lives in `README.md`; do not duplicate it here.
 ## Layout
 
 ```
-src/uv_python_project_template/   the package (renamed by rename-template.sh)
-  __init__.py   package code and its logger
-  main.py       `main()`, the `[project.scripts]` entry point
-test/           pytest unit tests (note: `test/`, not `tests/`)
-scripts/        githooks.py: installs/removes local Git hooks (poe install-hooks)
+main_package/     the package, at the repo root (renamed by rename-template.sh)
+  __init__.py     `__version__` and the package logger
+  __main__.py     `main()`: the `[project.scripts]` entry point and `python -m main_package`
+  greeting.py     example module
+  model/          example subpackage
+  resources/      non-code files; `__init__.py` exposes `DIR_RESOURCES` and `FILE_*` paths
+tests/            pytest unit tests
+scripts/          githooks.py: installs/removes local Git hooks (poe install-hooks)
 .github/workflows/
-  check.yml     static-checks + coverage, then tests on ubuntu/windows/macos x Python 3.10-3.13,
-                then deploy.yml
-  deploy.yml    semantic-release (dry run off main/master and on the initial commit)
-  init.yml      one-shot: renames the template in repos created from it, then deletes itself
+  check.yml       static-checks + coverage, then tests on ubuntu/windows/macos x Python 3.10-3.13,
+                  then deploy.yml
+  deploy.yml      semantic-release (dry run off main/master and on the initial commit)
+  init.yml        one-shot: renames the template in repos created from it, then deletes itself
 ```
 
 ## Commands
@@ -47,6 +50,13 @@ one tagged line each. Foreign hooks are never overwritten. `--no-verify` skips t
   the CI matrix and `requires-python`; keep the three in sync).
 - Manage dependencies with `uv add` / `uv add --dev`, never by hand-editing `uv.lock`.
 - Tests must not hit the network.
+- Long strings (LLM prompts, templates, messages), configuration, icons and other assets go in
+  files under `main_package/resources/`, never inline in code. Reference them through
+  `Path` constants in `resources/__init__.py` (`FILE_CONFIG = DIR_RESOURCES / "config.json"`);
+  everything in the package directory ships in the wheel.
+- Names go from general to specific: general prefix, specific suffix (`DIR_DATA`,
+  `FILE_CONFIG`, `URL_API_BASE`, not `DATA_DIR`, `CONFIG_FILE`, `API_BASE_URL`), so related
+  identifiers sort and autocomplete together.
 
 ## Releases
 
