@@ -4,7 +4,7 @@
 # If an author is given, it replaces the `authors` list in pyproject.toml.
 set -euo pipefail
 
-TEMPLATE_PROJECT_NAME="uv-python-project-template"
+TEMPLATE_PROJECT_NAME="template-python-project-uv"
 TEMPLATE_MODULE_NAME="main_package"
 
 if [[ $# -lt 1 || $# -gt 3 ]]; then
