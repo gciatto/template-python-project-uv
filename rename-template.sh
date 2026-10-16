@@ -1,45 +1,48 @@
 #!/usr/bin/env bash
+# Renames the template's project and package after the given name (run by init.yml).
+# Rewrites every tracked text file mentioning the template names, except this script.
+set -euo pipefail
 
 TEMPLATE_PROJECT_NAME="uv-python-project-template"
 TEMPLATE_MODULE_NAME="uv_python_project_template"
 
-if [[ $# -ne 1 || -z "${1:-}" ]]; then
-    echo "Usage: $0 <new-project-name>" 1>&2
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <new-project-name>" >&2
     exit 1
 fi
 
 PROJECT_NAME=$1
 
-if [[ ! "$PROJECT_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
-    echo "Warning: project name '$PROJECT_NAME' is unusual; continuing with a best-effort rename." 1>&2
+# PEP 508 project name; this also rules out characters special to sed.
+if [[ ! "$PROJECT_NAME" =~ ^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$ ]]; then
+    echo "Error: '$PROJECT_NAME' is not a valid Python project name" >&2
+    exit 1
 fi
 
-MODULE_NAME=$(printf "%s" "$PROJECT_NAME" \
-    | tr "[:upper:]" "[:lower:]" \
-    | sed -E "s/[-.]+/_/g; s/[^a-z0-9_]/_/g; s/_+/_/g; s/^_+//; s/_+$//")
-
-if [[ -z "$MODULE_NAME" ]]; then
-    echo "Warning: could not derive a Python module name from '$PROJECT_NAME'; using '$TEMPLATE_MODULE_NAME'." 1>&2
-    MODULE_NAME=$TEMPLATE_MODULE_NAME
-fi
-
+# PEP 503 normalization, with '_' as separator; identifiers cannot start with a digit.
+MODULE_NAME=$(printf "%s" "$PROJECT_NAME" | tr "[:upper:]" "[:lower:]" | sed -E "s/[-_.]+/_/g")
 if [[ "$MODULE_NAME" =~ ^[0-9] ]]; then
     MODULE_NAME="_$MODULE_NAME"
 fi
 
-if [[ ! "$MODULE_NAME" =~ ^[a-z_][a-z0-9_]*$ ]]; then
-    echo "Warning: derived Python module name '$MODULE_NAME' is unusual; continuing." 1>&2
+cd "$(dirname "$0")"
+
+if [[ ! -d "src/$TEMPLATE_MODULE_NAME" ]]; then
+    echo "Error: src/$TEMPLATE_MODULE_NAME not found; was the project already renamed?" >&2
+    exit 1
 fi
 
-for FILE in `find src test -type f  -not -iname '*.pyc' -not -path '*.git*'`; do 
-    sed -i '' -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" $FILE
-done
+git grep -lzI -F -e "$TEMPLATE_PROJECT_NAME" -e "$TEMPLATE_MODULE_NAME" -- . ':!rename-template.sh' \
+    | while IFS= read -r -d '' FILE; do
+        # -i.bak works with both GNU and BSD sed
+        sed -i.bak -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" \
+            -e "s/$TEMPLATE_PROJECT_NAME/$PROJECT_NAME/g" "$FILE"
+        rm "$FILE.bak"
+        echo "Updated $FILE"
+    done
 
-sed -i '' -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" pyproject.toml
-sed -i '' -e "s/$TEMPLATE_PROJECT_NAME/$PROJECT_NAME/g" pyproject.toml
-sed -i '' -e "s/$TEMPLATE_PROJECT_NAME/$PROJECT_NAME/g" uv.lock
-sed -i '' -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" AGENTS.md
-
-mv "src/$TEMPLATE_MODULE_NAME" "src/$MODULE_NAME"
+if [[ "$MODULE_NAME" != "$TEMPLATE_MODULE_NAME" ]]; then
+    mv "src/$TEMPLATE_MODULE_NAME" "src/$MODULE_NAME"
+fi
 
 echo "Renamed project to '$PROJECT_NAME' with Python module '$MODULE_NAME'."

@@ -18,6 +18,9 @@ uv_python_project_template = "uv_python_project_template.main:main"
 requires = ["uv_build>=0.13.0,<0.14.0"]
 build-backend = "uv_build"
 
+[tool.uv.build-backend]
+module-name = "uv_python_project_template"
+
 [dependency-groups]
 dev = [
     "coverage>=7.14.0",
