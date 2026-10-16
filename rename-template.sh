@@ -33,6 +33,23 @@ if [[ ! -d "$TEMPLATE_MODULE_NAME" ]]; then
     exit 1
 fi
 
+# Valid identifiers can still be unimportable (keywords) or shadow the standard library.
+python3 - "$MODULE_NAME" <<'EOF'
+import keyword, sys
+
+name = sys.argv[1]
+if keyword.iskeyword(name):
+    sys.exit(f"Error: '{name}' is a Python keyword")
+if name in sys.stdlib_module_names:
+    sys.exit(f"Error: '{name}' would shadow the standard library module")
+EOF
+
+# Otherwise `mv` would move the package inside the existing path (e.g. tests/).
+if [[ "$MODULE_NAME" != "$TEMPLATE_MODULE_NAME" && -e "$MODULE_NAME" ]]; then
+    echo "Error: '$MODULE_NAME' already exists in the repository" >&2
+    exit 1
+fi
+
 if [[ $# -ge 2 ]]; then
     # TOML basic strings accept JSON-escaped text.
     python3 - "$2" "${3:-}" <<'EOF'
