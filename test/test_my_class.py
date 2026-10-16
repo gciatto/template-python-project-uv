@@ -1,6 +1,6 @@
 import pytest
 
-from uv_python_project_template import MyClass
+from uv_python_project_template import MyClass, __version__
 
 
 # can test using classes, name must begin with `Test`
@@ -30,3 +30,7 @@ def test_sample_fixture(sample_fixture):
 
 def test_sample_fixture_isolated(sample_fixture):
     assert sample_fixture == [42]
+
+
+def test_version_comes_from_package_metadata():
+    assert __version__.count(".") == 2
