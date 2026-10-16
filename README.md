@@ -20,13 +20,17 @@ The template starts with a minimal package named `uv_python_project_template`, w
 │   └── uv_python_project_template/   # main package (renamed into your project name)
 │       ├── __init__.py
 │       └── main.py                   # application entry point
-├── test/                            # test package
+├── test/                             # test package
+│   ├── test_githooks.py              # tests for scripts/githooks.py
 │   └── test_my_class.py              # pytest example
+├── scripts/
+│   └── githooks.py                   # installs/removes local Git hooks
 ├── .github/                          # configuration of GitHub Actions
 │   └── workflows/
 │       ├── check.yml                 # runs checks and tests on multiple OSs and Python versions
 │       ├── deploy.yml                # releases to PyPI/TestPyPI with semantic-release
 │       └── init.yml                  # initializes repositories created from this template
+├── AGENTS.md                         # notes for coding agents and contributors
 ├── CHANGELOG.md                      # generated release changelog
 ├── LICENSE                           # license file
 ├── package.json                      # Node.js dependencies for semantic-release
@@ -118,6 +122,10 @@ can be run through uv.
 | `uv run poe mypy` | Type-check `src/` and `test/` with Mypy. |
 | `uv run poe compile` | Compile `src/` and `test/` to catch syntax errors. |
 | `uv run poe static-checks` | Run the configured static checks, currently Ruff and Mypy. |
+| `uv run poe install-hooks [HOOK...]` | Install local Git hooks (`pre-commit`, `conventional-commits`, `no-ai-signature`, `pre-push`; default: all). |
+| `uv run poe uninstall-hooks [HOOK...]` | Remove the hooks installed by `install-hooks`. |
+
+Contributor/agent notes (layout, conventions, hooks) are in [`AGENTS.md`](AGENTS.md).
 
 
 ## Release a new version on PyPi

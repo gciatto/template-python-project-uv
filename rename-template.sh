@@ -38,6 +38,7 @@ done
 sed -i '' -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" pyproject.toml
 sed -i '' -e "s/$TEMPLATE_PROJECT_NAME/$PROJECT_NAME/g" pyproject.toml
 sed -i '' -e "s/$TEMPLATE_PROJECT_NAME/$PROJECT_NAME/g" uv.lock
+sed -i '' -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" AGENTS.md
 
 mv "src/$TEMPLATE_MODULE_NAME" "src/$MODULE_NAME"
 
