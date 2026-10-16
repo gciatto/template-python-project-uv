@@ -29,7 +29,9 @@ if (!dryRun) {
     config.plugins.push(
         ["@semantic-release/github", {
             "assets": [
-                { "path": "dist/*" },
+                // Not dist/*: `uv build` also writes dist/.gitignore, which would be uploaded.
+                { "path": "dist/*.whl" },
+                { "path": "dist/*.tar.gz" },
             ]
         }],
         ["@semantic-release/git", {
