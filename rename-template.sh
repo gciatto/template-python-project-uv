@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Renames the template's project and package after the given name (run by init.yml).
 # Rewrites every tracked text file mentioning the template names, except this script.
+# If an author is given, it replaces the `authors` list in pyproject.toml.
 set -euo pipefail
 
 TEMPLATE_PROJECT_NAME="uv-python-project-template"
 TEMPLATE_MODULE_NAME="uv_python_project_template"
 
-if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 <new-project-name>" >&2
+if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "Usage: $0 <new-project-name> [<author-name> [<author-email>]]" >&2
     exit 1
 fi
 
@@ -30,6 +31,23 @@ cd "$(dirname "$0")"
 if [[ ! -d "src/$TEMPLATE_MODULE_NAME" ]]; then
     echo "Error: src/$TEMPLATE_MODULE_NAME not found; was the project already renamed?" >&2
     exit 1
+fi
+
+if [[ $# -ge 2 ]]; then
+    # TOML basic strings accept JSON-escaped text.
+    python3 - "$2" "${3:-}" <<'EOF'
+import json, re, sys
+from pathlib import Path
+
+name, email = sys.argv[1:]
+author = f"name = {json.dumps(name)}" + (f", email = {json.dumps(email)}" if email else "")
+path = Path("pyproject.toml")
+authors = f"authors = [\n    {{ {author} }}\n]"
+text, n = re.subn(r"(?ms)^authors = \[.*?^\]", lambda _: authors, path.read_text())
+if n != 1:
+    sys.exit("Error: no `authors = [...]` list in pyproject.toml")
+path.write_text(text)
+EOF
 fi
 
 git grep -lzI -F -e "$TEMPLATE_PROJECT_NAME" -e "$TEMPLATE_MODULE_NAME" -- . ':!rename-template.sh' \

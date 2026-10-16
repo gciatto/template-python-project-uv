@@ -18,15 +18,21 @@ jobs:
       - name: Configure Git
         run: |
           git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR_EMAIL}"
+          git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
         shell: bash
 
       - name: Checkout
         uses: actions/checkout@v7
 
       - name: Rename project
-        run: bash rename-template.sh $(basename ${{ github.repository }})
+        run: |
+          AUTHOR_NAME=$(gh api "users/$GITHUB_ACTOR" --jq '.name // .login')
+          AUTHOR_EMAIL=$(gh api "users/$GITHUB_ACTOR" --jq '.email // empty')
+          bash rename-template.sh "$(basename "$GITHUB_REPOSITORY")" "$AUTHOR_NAME" \
+            "${AUTHOR_EMAIL:-$GITHUB_ACTOR_ID+$GITHUB_ACTOR@users.noreply.github.com}"
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v10.3.0
