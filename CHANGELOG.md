@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/gciatto/template-python-project-uv/compare/1.0.1...1.0.2) (2026-10-17)
+
+### Bug Fixes
+
+* **deps:** move poethepoet from runtime to dev dependencies ([2f1269d](https://github.com/gciatto/template-python-project-uv/commit/2f1269da6cc7ae0ff0ae204f01ca4dd6d4becbb0))
+
 ## [1.0.1](https://github.com/gciatto/template-python-project-uv/compare/1.0.0...1.0.1) (2026-10-16)
 
 ### Bug Fixes
