@@ -7,9 +7,7 @@ authors = [
     { name = "Giovanni Ciatto", email = "giovanni.ciatto@unibo.it" }
 ]
 requires-python = ">=3.10" # Update workflows/check.yml if you change this
-dependencies = [
-    "poethepoet>=0.45.0",
-]
+dependencies = []
 
 [project.scripts]
 main_package = "main_package.__main__:main"
@@ -26,6 +24,7 @@ module-root = ""
 dev = [
     "coverage>=7.14.0",
     "mypy>=2.1.0",
+    "poethepoet>=0.45.0",
     "pytest>=9.0.3",
     "ruff>=0.15.12",
 ]
