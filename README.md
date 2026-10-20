@@ -74,7 +74,8 @@ uv python list
    The `.github/workflows/init.yml` workflow runs automatically on `main` or
    `master` when the repository is neither marked as a template nor a fork. It calls
    `rename-template.sh` to replace the template placeholders with the repository
-   name, removes the initialization workflow, and commits the result.
+   name, commits the result, and disables itself (delete `init.yml` and
+   `rename-template.sh` whenever you like).
 
 3. Install dependencies:
 

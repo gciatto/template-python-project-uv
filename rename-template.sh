@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Renames the template's project and package after the given name (run by init.yml).
-# Rewrites every tracked text file mentioning the template names, except this script.
+# Rewrites every tracked text file mentioning the template names, except this script and the
+# workflows (GITHUB_TOKEN cannot push workflow changes).
 # If an author is given, it replaces the `authors` list in pyproject.toml.
 set -euo pipefail
 
@@ -67,7 +68,7 @@ path.write_text(text)
 EOF
 fi
 
-git grep -lzI -F -e "$TEMPLATE_PROJECT_NAME" -e "$TEMPLATE_MODULE_NAME" -- . ':!rename-template.sh' \
+git grep -lzI -F -e "$TEMPLATE_PROJECT_NAME" -e "$TEMPLATE_MODULE_NAME" -- . ':!rename-template.sh' ':!.github/workflows' \
     | while IFS= read -r -d '' FILE; do
         # -i.bak works with both GNU and BSD sed
         sed -i.bak -e "s/$TEMPLATE_MODULE_NAME/$MODULE_NAME/g" \
