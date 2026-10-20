@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/gciatto/template-python-project-uv/compare/1.0.2...1.0.3) (2026-10-20)
+
+### Bug Fixes
+
+* **ci:** keep init workflow from pushing workflow changes ([6e734e1](https://github.com/gciatto/template-python-project-uv/commit/6e734e126ad526aad3f7f695e6c7894a8b6410d2)), closes [#1](https://github.com/gciatto/template-python-project-uv/issues/1)
+
 ## [1.0.2](https://github.com/gciatto/template-python-project-uv/compare/1.0.1...1.0.2) (2026-10-17)
 
 ### Bug Fixes
